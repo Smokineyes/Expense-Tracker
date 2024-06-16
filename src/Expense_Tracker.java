@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -34,11 +32,14 @@ public class Expense_Tracker {
             connection.createStatement().execute(createTableSQL);
 
             // Insert an expense record
-            Expense expense = new Expense(50.0, "Food", "Lunch at restaurant", new Date());
-            addExpense(connection, expense);
+//            Expense expense = new Expense(80.0, "Food", "Lunch at restaurant", new Date());
+//            addExpense(connection, expense);
+
+
+                filterExpenseDate(connection,"2024-06-10","2024-06-16");
 
             connection.close();
-        } catch ( SQLException e) {
+        } catch (SQLException | ParseException e) {
             e.printStackTrace();
         }
     }
@@ -57,5 +58,47 @@ public class Expense_Tracker {
         } else {
             System.out.println("Failed to add expense.");
         }
+    }
+    public static void printallExpense(Connection connection) throws SQLException {
+        String retrieve="Select * from expenses";
+        Statement stmt= connection.createStatement();
+        ResultSet resultSet = stmt.executeQuery(retrieve);
+        while (resultSet.next()){
+            System.out.println(resultSet.getString("amount"));
+        }
+
+    }
+    public static void deleteExpense(Connection connection,int id) throws SQLException {
+        String update="delete from expenses where id="+id;
+        Statement stmt= connection.createStatement();
+        int del = stmt.executeUpdate(update);
+       printallExpense(connection);
+
+    }
+    public static void filterExpenseDate(Connection connection,String startdate,String enddate) throws SQLException, ParseException {
+        Date End= new SimpleDateFormat("yyyy-MM-dd").parse(enddate);
+        Date Start= new SimpleDateFormat("yyyy-MM-dd").parse(startdate);
+        String retrieve = "SELECT * FROM expenses WHERE date >= ? and date<=?";
+        PreparedStatement stmt = connection.prepareStatement(retrieve);
+        stmt.setDate(1, new java.sql.Date(Start.getTime()));
+        stmt.setDate(2, new java.sql.Date(End.getTime()));
+        ResultSet resultSet = stmt.executeQuery();
+
+        while (resultSet.next()) {
+            System.out.println("Amount: " + resultSet.getDouble("amount"));
+            System.out.println("Category: " + resultSet.getString("category"));
+            System.out.println("Description: " + resultSet.getString("description"));
+            System.out.println("Date: " + resultSet.getDate("date"));
+            System.out.println("-----");
+        }
+    }
+    public static void filterExpenseCat(Connection connection,String cat) throws SQLException {
+        String retrieve="Select * from expenses where category="+cat;
+        Statement stmt= connection.createStatement();
+        ResultSet resultSet = stmt.executeQuery(retrieve);
+        while (resultSet.next()){
+            System.out.println(resultSet.getString("amount"));
+        }
+
     }
 }
