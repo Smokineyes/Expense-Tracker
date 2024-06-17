@@ -361,7 +361,8 @@ public class Expense_Tracker1 extends JFrame {
             map.entrySet().stream()
                     .forEach(entry -> output.append("\nCategory: ").append(entry.getKey())
                             .append("------ Price Percentage: ").append(entry.getValue()).append("%\n"));
-
-            outputArea.setText(output.toString());}
+                output.append("\nTotal Expense:"+sum);
+            outputArea.setText(output.toString());
+        }
     }
 }
