@@ -348,7 +348,7 @@ public class Expense_Tracker1 extends JFrame {
         while (resultSet.next()) {
             sum += resultSet.getDouble("amount");
             String category = resultSet.getString("category");
-            if (!categories.contains(category)) {
+            if (categories.stream().noneMatch(c -> c.equalsIgnoreCase(category))) {
                 categories.add(category);
             }
         }
@@ -357,7 +357,11 @@ public class Expense_Tracker1 extends JFrame {
         for (String cat : categories) {
             map.put(cat, Double.valueOf(df.format(100 * retrieveAmount(cat) / sum)));
         }
+            StringBuilder output = new StringBuilder();
+            map.entrySet().stream()
+                    .forEach(entry -> output.append("\nCategory: ").append(entry.getKey())
+                            .append("------ Price Percentage: ").append(entry.getValue()).append("%\n"));
 
-        outputArea.setText(map.toString()+"");}
+            outputArea.setText(output.toString());}
     }
 }
